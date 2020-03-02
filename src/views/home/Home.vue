@@ -3,11 +3,14 @@
         <NavBar class="home-nav">
             <div slot="center">蘑菇街</div>
         </NavBar>
+        <Scroll class="content" ref="scroll">
         <home-swiper :banner="banner"></home-swiper>
         <recommend-view :recommend="recommend"></recommend-view>
         <feature-view></feature-view>
         <tab-control :titles="titles" class="tab-control" @tabClick="tabClick"></tab-control>
         <goods-list :goodsList="showGoods"></goods-list>
+        </Scroll>
+        <back-top @click.native="backTop"></back-top>
     </div>
 </template>
 
@@ -18,12 +21,16 @@
     import HomeSwiper from "./childComps/HomeSwiper";
     import RecommendView from "./childComps/RecommendView";
     import FeatureView from "./childComps/FeatureView";
-    import TabControl from "../../components/content/tabControl/TabControl";
-    import GoodsList from "../../components/content/goods/GoodsList";
+    import TabControl from "components/content/tabControl/TabControl";
+    import GoodsList from "components/content/goods/GoodsList";
+    import Scroll from "components/common/scroll/Scroll";
+    import BackTop from "components/content/backtop/BackTop";
 
     export default {
         name: "Home",
         components: {
+            BackTop,
+            Scroll,
             GoodsList,
             TabControl,
             FeatureView,
@@ -75,6 +82,13 @@
             },
 
             /**
+             * 子组件按钮返回顶部
+             */
+            backTop(){
+                this.$refs.scroll.scroll.scrollTo(0,0,300)
+            },
+
+            /**
              * 网络请求相关
              */
             getHomeMultidate(){
@@ -119,5 +133,13 @@
         position: sticky;
         top: 44px;
         z-index: 9;
+    }
+    .content{
+        overflow: hidden;
+        position: absolute;
+        top: 44px;
+        bottom: 44px;
+        left: 0;
+        right: 0;
     }
 </style>

@@ -5,6 +5,7 @@ import vConsole from 'vconsole'
 
 Vue.config.productionTip = false
 Vue.prototype.$vConsole= new vConsole()
+Vue.prototype.$bus= new Vue()
 
 new Vue({
   render: h => h(App),

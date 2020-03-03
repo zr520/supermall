@@ -3,13 +3,21 @@
         <NavBar class="home-nav">
             <div slot="center">蘑菇街</div>
         </NavBar>
+        <tab-control :titles="titles" class="tab-control"
+                     @tabClick="tabClick" ref="tabControl1"
+                     v-show="isShowTab"
+        >
+        </tab-control>
         <Scroll class="content" ref="scroll"
                 :probeType="3" @scroll="scroll" :pullUpLoad="true"
                 @pullingUp="pullingUp">
-        <home-swiper :banner="banner"></home-swiper>
+        <home-swiper :banner="banner" @homeswiperload="homeswiperload"></home-swiper>
         <recommend-view :recommend="recommend"></recommend-view>
         <feature-view></feature-view>
-        <tab-control :titles="titles" class="tab-control" @tabClick="tabClick"></tab-control>
+        <tab-control :titles="titles" class="tab-control"
+                     @tabClick="tabClick" ref="tabControl2"
+                   >
+        </tab-control>
         <goods-list :goodsList="showGoods"></goods-list>
         </Scroll>
         <back-top @click.native="backTop" v-show="hide"></back-top>
@@ -55,6 +63,12 @@
             this.getHomeGoods('pop'),
             this.getHomeGoods('new'),
             this.getHomeGoods('sell')
+            // setTimeout(()=>{
+            //     this.$refs.tabControl.$el.offsetTop
+            //     console.log(this.$refs.tabControl.$el.offsetTop,'111111')
+            // },300)
+            // console.log(this.$refs.tabControl.$el.offsetTop,'00000000')
+
         },
         data(){
             return{
@@ -63,18 +77,32 @@
                 recommend:[],
                 titles:['流行','新款','精选'],
                 goods:{
-                    'pop':{page:49,list:[]},
+                    'pop':{page:1,list:[]},
                     'new':{page:1,list:[]},
                     'sell':{page:1,list:[]},
                 },
                 currentTabType:'pop',
-                hide:false
+                hide:false,
+                tabConTrolSide:0,
+                isShowTab:false,
+                //记录离开时Y轴的距离
+                scrollY: 0
             }
         },
         computed:{
             showGoods(){
                 return this.goods[this.currentTabType].list
             }
+        },
+        activated(){
+            //回来时取出那个值
+            this.$refs.scroll.scroll.scrollTo(0,this.scrollY,0)
+            //若出现回不到记录位置的情况,调用这个函数
+            this.$refs.scroll.refresh
+        },
+        deactivated(){
+            //离开时记录Y值
+            this.scrollY= this.$refs.scroll.scroll.y
         },
         methods:{
             /**
@@ -92,6 +120,16 @@
                         this.currentTabType = 'sell'
                         break;
                 }
+                this.$refs.tabControl1.currentIndex = index
+                this.$refs.tabControl2.currentIndex = index
+            },
+            /**
+             * 监听子组件HomeSwiper的加载
+             */
+            homeswiperload(){
+                // console.log('---------')
+                //当轮播图片加载完成后，才会最终得到tab距离顶部的距离
+                this.tabConTrolSide = this.$refs.tabControl2.$el.offsetTop
             },
             /**
              * 监听子组件scroll的滚动
@@ -99,6 +137,7 @@
             scroll(position){
                 // console.log(position)
                 this.hide = (-position.y) >1000
+                this.isShowTab = (-position.y) > this.tabConTrolSide
             },
             /**
              * 监听子组件scroll的上拉加载更多

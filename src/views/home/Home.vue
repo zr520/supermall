@@ -203,8 +203,7 @@
         z-index: 9;
     }
     .tab-control{
-        position: sticky;
-        top: 44px;
+        position: relative;
         z-index: 9;
     }
     .content{

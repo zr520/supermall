@@ -26,5 +26,6 @@
         flex-wrap: wrap;
         justify-content: space-around;
         padding: 2px;
+        background-color: #fff;
     }
 </style>

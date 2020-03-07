@@ -27,7 +27,7 @@
 <script>
     import {getHomeMultidate,getHomeGoods} from "network/home";
     import {debounce} from 'common/utils'
-
+    import {itemListenerMixin} from 'common/mixin'
     import NavBar from "components/common/navbar/NavBar";
     import HomeSwiper from "./childComps/HomeSwiper";
     import RecommendView from "./childComps/RecommendView";
@@ -53,12 +53,13 @@
 
         },
         mounted() {
-            const refresh = debounce(this.$refs.scroll.refresh,50)
-            //监听列表中图片是否加载完成
-            this.$bus.$on('itemImageLoad',()=>{
-                //,当图片都加载完成后，重新计算 BetterScroll，当 DOM 结构发生变化的时候务必要调用确保滚动的效果正常
-                refresh()
-            })
+            // const refresh = debounce(this.$refs.scroll.refresh,50)
+            // //监听列表中图片是否加载完成
+            // this.itemListener = ()=>{
+            //     //,当图片都加载完成后，重新计算 BetterScroll，当 DOM 结构发生变化的时候务必要调用确保滚动的效果正常
+            //     refresh()
+            // }
+            // this.$bus.$on('itemImageLoad',this.itemListener)
             this.getHomeMultidate(),
             this.getHomeGoods('pop'),
             this.getHomeGoods('new'),
@@ -70,6 +71,7 @@
             // console.log(this.$refs.tabControl.$el.offsetTop,'00000000')
 
         },
+        mixins:[itemListenerMixin],
         data(){
             return{
                 result:'',
@@ -86,7 +88,8 @@
                 tabConTrolSide:0,
                 isShowTab:false,
                 //记录离开时Y轴的距离
-                scrollY: 0
+                scrollY: 0,
+                // itemListener:null
             }
         },
         computed:{
@@ -103,6 +106,8 @@
         deactivated(){
             //离开时记录Y值
             this.scrollY= this.$refs.scroll.scroll.y
+            //离开时取消全局事件的监听
+            this.$bus.$off('itemImageLoad',this.itemListener)
         },
         methods:{
             /**
